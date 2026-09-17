@@ -4,137 +4,52 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>X QR Studio</title>
-  <!-- 安定したQRコード生成ライブラリ -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcode-generator/1.4.4/qrcode.min.js"></script>
   <style>
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-      -webkit-tap-highlight-color: transparent;
-    }
+    * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
     body {
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-      background: #0f172a;
-      color: #f8fafc;
-      min-height: 100vh;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      padding: 20px 16px 40px;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      background: #0f172a; color: #f8fafc; min-height: 100vh;
+      display: flex; flex-direction: column; align-items: center; padding: 20px 16px 40px;
     }
-    header {
-      text-align: center;
-      margin-bottom: 24px;
-      margin-top: 10px;
-    }
+    header { text-align: center; margin-bottom: 20px; margin-top: 10px; }
     h1 {
-      font-size: 22px;
-      font-weight: 800;
+      font-size: 22px; font-weight: 800;
       background: linear-gradient(135deg, #38bdf8, #818cf8);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      margin-bottom: 6px;
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent; margin-bottom: 4px;
     }
-    p.sub {
-      font-size: 13px;
-      color: #94a3b8;
-    }
+    p.sub { font-size: 13px; color: #94a3b8; }
     .input-card {
-      width: 100%;
-      max-width: 400px;
-      background: #1e293b;
-      padding: 20px;
-      border-radius: 20px;
-      box-shadow: 0 10px 25px -5px rgba(0,0,0,0.3);
-      border: 1px solid #334155;
-      margin-bottom: 24px;
+      width: 100%; max-width: 360px; background: #1e293b; padding: 16px;
+      border-radius: 16px; border: 1px solid #334155; margin-bottom: 20px;
     }
-    .input-group {
-      display: flex;
-      flex-direction: column;
-      gap: 8px;
-    }
-    label {
-      font-size: 13px;
-      font-weight: 600;
-      color: #cbd5e1;
-    }
+    .input-group { display: flex; flex-direction: column; gap: 6px; }
+    label { font-size: 12px; font-weight: 600; color: #cbd5e1; }
     .input-wrapper {
-      display: flex;
-      align-items: center;
-      background: #0f172a;
-      border: 2px solid #334155;
-      border-radius: 12px;
-      padding: 0 14px;
-      transition: all 0.2s;
+      display: flex; align-items: center; background: #0f172a;
+      border: 2px solid #334155; border-radius: 10px; padding: 0 12px;
     }
-    .input-wrapper:focus-within {
-      border-color: #38bdf8;
-    }
-    .prefix {
-      color: #64748b;
-      font-weight: 700;
-      font-size: 16px;
-    }
+    .input-wrapper:focus-within { border-color: #38bdf8; }
+    .prefix { color: #64748b; font-weight: 700; font-size: 16px; }
     input[type="text"] {
-      width: 100%;
-      background: transparent;
-      border: none;
-      outline: none;
-      color: #ffffff;
-      padding: 14px 8px;
-      font-size: 16px;
-      font-weight: 600;
+      width: 100%; background: transparent; border: none; outline: none;
+      color: #ffffff; padding: 12px 6px; font-size: 16px; font-weight: 600;
     }
-    .preview-container {
-      width: 100%;
-      max-width: 360px;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-    }
-    canvas {
-      width: 100%;
-      height: auto;
-      border-radius: 24px;
-      box-shadow: 0 20px 30px -10px rgba(0, 0, 0, 0.5);
-    }
+    .preview-container { width: 100%; max-width: 360px; display: flex; flex-direction: column; align-items: center; }
+    canvas { width: 100%; height: auto; border-radius: 20px; box-shadow: 0 15px 25px -5px rgba(0,0,0,0.5); }
     .action-btn {
-      width: 100%;
-      max-width: 360px;
-      margin-top: 20px;
-      background: linear-gradient(135deg, #1d9bf0, #0c82d8);
-      color: #ffffff;
-      border: none;
-      padding: 16px;
-      border-radius: 16px;
-      font-size: 16px;
-      font-weight: 700;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 8px;
-      box-shadow: 0 4px 15px rgba(29, 155, 240, 0.4);
-      transition: transform 0.1s;
+      width: 100%; max-width: 360px; margin-top: 16px;
+      background: linear-gradient(135deg, #1d9bf0, #0c82d8); color: #ffffff;
+      border: none; padding: 14px; border-radius: 14px; font-size: 15px; font-weight: 700;
+      cursor: pointer; box-shadow: 0 4px 12px rgba(29, 155, 240, 0.4);
     }
-    .action-btn:active {
-      transform: scale(0.98);
-    }
-    .hint {
-      font-size: 12px;
-      color: #64748b;
-      margin-top: 12px;
-      text-align: center;
-    }
+    .hint { font-size: 12px; color: #64748b; margin-top: 10px; text-align: center; }
   </style>
 </head>
 <body>
 
   <header>
     <h1>X QR Studio</h1>
-    <p class="sub">X用 高画質QRコード生成ツール</p>
+    <p class="sub">X専用 高精度QRコード作成</p>
   </header>
 
   <div class="input-card">
@@ -149,109 +64,229 @@
 
   <div class="preview-container">
     <canvas id="qrCanvas" width="800" height="1000"></canvas>
-    <button class="action-btn" id="saveBtn">画像を保存・共有する</button>
-    <p class="hint">※ ボタンを押すか、画像を長押しして保存できます</p>
+    <button class="action-btn" id="saveBtn">画像を共有・保存する</button>
+    <p class="hint">※ 長押しでも画像を保存できます</p>
   </div>
 
   <script>
+    // --- 外部依存なし完全自前QRエンコーダ (Byte Mode + Error Correction Level H) ---
+    const QRCodeEngine = (function() {
+      const GF256 = new Uint8Array(512), LOG = new Uint8Array(256);
+      let x = 1;
+      for (let i = 0; i < 255; i++) {
+        GF256[i] = GF256[i + 255] = x; LOG[x] = i;
+        x = (x << 1) ^ (x & 128 ? 285 : 0);
+      }
+      function polyMul(p1, p2) {
+        const res = new Uint8Array(p1.length + p2.length - 1);
+        for (let i = 0; i < p1.length; i++) {
+          if (!p1[i]) continue;
+          for (let j = 0; j < p2.length; j++) {
+            if (p2[j]) res[i + j] ^= GF256[LOG[p1[i]] + LOG[p2[j]]];
+          }
+        }
+        return res;
+      }
+      function getPoly(n) {
+        let g = new Uint8Array([1]);
+        for (let i = 0; i < n; i++) g = polyMul(g, new Uint8Array([1, GF256[i]]));
+        return g;
+      }
+
+      return {
+        generate: function(text) {
+          // Version 4-H 固定 (33x33, EC 36bytes, Data 36bytes)
+          const size = 33, ecCount = 36, dataCap = 36;
+          const bytes = new TextEncoder().encode(text);
+          const bits = [];
+          
+          function addBits(val, len) {
+            for (let i = len - 1; i >= 0; i--) bits.push((val >> i) & 1);
+          }
+
+          addBits(4, 4); // Byte Mode
+          addBits(bytes.length, 8);
+          for (let b of bytes) addBits(b, 8);
+          addBits(0, 4); // Terminator
+          while (bits.length % 8 !== 0) bits.push(0);
+          
+          const pad = [236, 17];
+          let pIdx = 0;
+          while (bits.length < dataCap * 8) {
+            addBits(pad[pIdx++ % 2], 8);
+          }
+
+          const data = new Uint8Array(dataCap);
+          for (let i = 0; i < dataCap; i++) {
+            let b = 0;
+            for (let j = 0; j < 8; j++) b = (b << 1) | bits[i * 8 + j];
+            data[i] = b;
+          }
+
+          // RS ECC
+          const gen = getPoly(ecCount);
+          const msg = new Uint8Array(dataCap + ecCount);
+          msg.set(data);
+          for (let i = 0; i < dataCap; i++) {
+            const coef = msg[i];
+            if (coef !== 0) {
+              for (let j = 0; j < gen.length; j++) {
+                msg[i + j] ^= GF256[LOG[coef] + LOG[gen[j]]];
+              }
+            }
+          }
+          const ec = msg.slice(dataCap);
+
+          // Matrix
+          const mat = Array.from({length: size}, () => new Int8Array(size).fill(-1));
+          
+          function setFinder(r, c) {
+            for (let i = -1; i <= 7; i++) {
+              for (let j = -1; j <= 7; j++) {
+                const tr = r + i, tc = c + j;
+                if (tr < 0 || tr >= size || tc < 0 || tc >= size) continue;
+                const isBorder = i === -1 || i === 7 || j === -1 || j === 7;
+                const isInner = i >= 1 && i <= 5 && j >= 1 && j <= 5 && (i === 1 || i === 5 || j === 1 || j === 5);
+                mat[tr][tc] = (isBorder || (!isInner && i >= 0 && i <= 6 && j >= 0 && j <= 6)) ? 1 : 0;
+              }
+            }
+          }
+          setFinder(0, 0); setFinder(0, size - 7); setFinder(size - 7, 0);
+
+          // Alignment Pattern
+          for (let i = -2; i <= 2; i++) {
+            for (let j = -2; j <= 2; j++) {
+              mat[26 + i][26 + j] = (Math.abs(i) === 2 || Math.abs(j) === 2 || (i === 0 && j === 0)) ? 1 : 0;
+            }
+          }
+
+          // Timing Pattern
+          for (let i = 8; i < size - 8; i++) {
+            if (mat[6][i] === -1) mat[6][i] = i % 2 === 0 ? 1 : 0;
+            if (mat[i][6] === -1) mat[i][6] = i % 2 === 0 ? 1 : 0;
+          }
+
+          // Dark Module
+          mat[size - 8][8] = 1;
+
+          // Format info (4-H)
+          const fmtBits = [0,1,1,0,0,0,1,0,0,0,1,0,0,0,0];
+          const coords = [
+            [0,0],[1,0],[2,0],[3,0],[4,0],[5,0],[7,0],[8,0],
+            [8,1],[8,2],[8,3],[8,4],[8,5],[8,7],[8,8]
+          ];
+          for (let i = 0; i < 15; i++) {
+            const b = fmtBits[i];
+            const [r1, c1] = coords[i];
+            mat[r1 < 8 ? r1 : size - 15 + r1][c1 < 8 ? c1 : size - 15 + c1] = b;
+            if (i < 7) mat[size - 1 - i][8] = b;
+            else mat[8][size - 15 + i] = b;
+          }
+
+          // Data Placement
+          const allData = new Uint8Array(dataCap + ecCount);
+          allData.set(data); allData.set(ec, dataCap);
+          
+          let bitIdx = 0;
+          let dir = -1;
+          for (let col = size - 1; col > 0; col -= 2) {
+            if (col === 6) col--;
+            for (let row = 0; row < size; row++) {
+              const r = dir === -1 ? size - 1 - row : row;
+              for (let c = col; c > col - 2; c--) {
+                if (mat[r][c] === -1) {
+                  let bit = 0;
+                  if (bitIdx < allData.length * 8) {
+                    bit = (allData[Math.floor(bitIdx / 8)] >> (7 - (bitIdx % 8))) & 1;
+                    bitIdx++;
+                  }
+                  // Mask Pattern 0 ( (r+c)%2 === 0 )
+                  if ((r + c) % 2 === 0) bit ^= 1;
+                  mat[r][c] = bit;
+                }
+              }
+            }
+            dir = -dir;
+          }
+
+          return { size, matrix: mat };
+        }
+      };
+    })();
+
+    // --- 画面描画ロジック ---
     const usernameInput = document.getElementById('username');
     const canvas = document.getElementById('qrCanvas');
     const ctx = canvas.getContext('2d');
     const saveBtn = document.getElementById('saveBtn');
 
     function drawCard() {
-      let rawUser = usernameInput.value.trim().replace(/^@/, '');
+      const rawUser = usernameInput.value.trim().replace(/^@/, '');
       const displayUser = rawUser ? `@${rawUser}` : '@username';
       const targetUrl = rawUser ? `https://x.com/${rawUser}` : 'https://x.com';
 
-      // 1. キャンバス初期化
+      // キャンバス初期化
       ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-      // 2. 背景グラデーション
+      // 背景グラデーション
       const bgGrad = ctx.createLinearGradient(0, 0, canvas.width, canvas.height);
-      bgGrad.addColorStop(0, '#15202b');
-      bgGrad.addColorStop(1, '#0b0f14');
+      bgGrad.addColorStop(0, '#15202b'); bgGrad.addColorStop(1, '#0b0f14');
       ctx.fillStyle = bgGrad;
-      
-      // 角丸外枠
-      drawRoundedRect(ctx, 0, 0, canvas.width, canvas.height, 40);
-      ctx.fill();
+      drawRoundedRect(ctx, 0, 0, canvas.width, canvas.height, 40); ctx.fill();
 
-      // カード金色の枠線
-      ctx.strokeStyle = '#d97706';
-      ctx.lineWidth = 12;
-      drawRoundedRect(ctx, 10, 10, canvas.width - 20, canvas.height - 20, 32);
-      ctx.stroke();
+      // カード外枠（金）
+      ctx.strokeStyle = '#d97706'; ctx.lineWidth = 12;
+      drawRoundedRect(ctx, 10, 10, canvas.width - 20, canvas.height - 20, 32); ctx.stroke();
 
-      // 3. 上部 Xロゴ
-      ctx.fillStyle = '#ffffff';
-      drawXLogo(ctx, canvas.width / 2, 110, 48);
+      // ヘッダーXロゴ
+      ctx.fillStyle = '#ffffff'; drawXLogo(ctx, canvas.width / 2, 110, 48);
 
-      // 4. テキスト
-      ctx.textAlign = 'center';
-      ctx.fillStyle = '#fef08a';
+      // テキスト表示
+      ctx.textAlign = 'center'; ctx.fillStyle = '#fef08a';
       ctx.font = 'bold 38px -apple-system, sans-serif';
       ctx.fillText('Follow me on X', canvas.width / 2, 200);
 
-      ctx.fillStyle = '#fef08a';
+      ctx.fillStyle = '#38bdf8';
       ctx.font = 'bold 34px -apple-system, sans-serif';
       ctx.fillText(displayUser, canvas.width / 2, 255);
 
-      // 5. QRコード生成（Error Correction Level H: 30%欠けても復元可能）
-      try {
-        const qr = qrcode(0, 'H');
-        qr.addData(targetUrl);
-        qr.make();
+      // QR生成＆描画
+      const qr = QRCodeEngine.generate(targetUrl);
+      const qrSize = 500;
+      const boxX = (canvas.width - qrSize) / 2;
+      const boxY = 310;
+      const cellSize = qrSize / qr.size;
 
-        const count = qr.getModuleCount();
-        const qrSize = 520;
-        const margin = 30;
-        const boxX = (canvas.width - qrSize) / 2;
-        const boxY = 300;
+      // QR背景（白）
+      const padding = 24;
+      ctx.fillStyle = '#ffffff';
+      drawRoundedRect(ctx, boxX - padding, boxY - padding, qrSize + padding * 2, qrSize + padding * 2, 24);
+      ctx.fill();
 
-        // QRの台座背景（黒）
-        ctx.fillStyle = '#05070a';
-        drawRoundedRect(ctx, boxX - margin, boxY - margin, qrSize + margin * 2, qrSize + margin * 2, 28);
-        ctx.fill();
-        ctx.strokeStyle = '#1e293b';
-        ctx.lineWidth = 4;
-        ctx.stroke();
-
-        // QRコード描画
-        const cellSize = qrSize / count;
-        ctx.fillStyle = '#ffffff';
-
-        for (let row = 0; row < count; row++) {
-          for (let col = 0; col < count; col++) {
-            if (qr.isDark(row, col)) {
-              ctx.fillRect(
-                boxX + col * cellSize,
-                boxY + row * cellSize,
-                cellSize + 0.5,
-                cellSize + 0.5
-              );
-            }
+      // QRセル描画（黒）
+      ctx.fillStyle = '#000000';
+      for (let r = 0; r < qr.size; r++) {
+        for (let c = 0; c < qr.size; c++) {
+          if (qr.matrix[r][c] === 1) {
+            ctx.fillRect(boxX + c * cellSize, boxY + r * cellSize, cellSize + 0.5, cellSize + 0.5);
           }
         }
-
-        // 6. QR中央のXロゴアイコン
-        const iconSize = 100;
-        const iconX = canvas.width / 2;
-        const iconY = boxY + qrSize / 2;
-
-        ctx.fillStyle = '#05070a';
-        ctx.beginPath();
-        ctx.arc(iconX, iconY, iconSize / 2 + 8, 0, Math.PI * 2);
-        ctx.fill();
-
-        ctx.fillStyle = '#ffffff';
-        drawXLogo(ctx, iconX, iconY, iconSize * 0.5);
-
-      } catch (e) {
-        console.error(e);
       }
 
-      // 7. フッター
+      // 中央ロゴ枠（丸アイコン）
+      const logoBgSize = 96;
+      const logoX = canvas.width / 2;
+      const logoY = boxY + qrSize / 2;
+
+      ctx.fillStyle = '#000000';
+      ctx.beginPath();
+      ctx.arc(logoX, logoY, logoBgSize / 2, 0, Math.PI * 2);
+      ctx.fill();
+
+      ctx.fillStyle = '#ffffff';
+      drawXLogo(ctx, logoX, logoY, 44);
+
+      // フッター
       ctx.fillStyle = '#64748b';
       ctx.font = '500 22px -apple-system, sans-serif';
       ctx.fillText('Scan with camera', canvas.width / 2, 900);
@@ -280,53 +315,34 @@
       ctx.translate(cx, cy);
       const s = size / 2;
       ctx.beginPath();
-      ctx.moveTo(-s, -s);
-      ctx.lineTo(s * 0.6, s);
-      ctx.lineTo(s, s);
-      ctx.lineTo(-s * 0.6, -s);
-      ctx.closePath();
-      ctx.fill();
-
+      ctx.moveTo(-s, -s); ctx.lineTo(s * 0.6, s); ctx.lineTo(s, s); ctx.lineTo(-s * 0.6, -s);
+      ctx.closePath(); ctx.fill();
       ctx.beginPath();
-      ctx.moveTo(s, -s);
-      ctx.lineTo(-s * 0.6, s);
-      ctx.lineTo(-s, s);
-      ctx.lineTo(s * 0.6, -s);
-      ctx.closePath();
-      ctx.fill();
+      ctx.moveTo(s, -s); ctx.lineTo(-s * 0.6, s); ctx.lineTo(-s, s); ctx.lineTo(s * 0.6, -s);
+      ctx.closePath(); ctx.fill();
       ctx.restore();
     }
 
-    // イベント設定
     usernameInput.addEventListener('input', drawCard);
 
-    // 画像保存・共有
     saveBtn.addEventListener('click', async () => {
       const dataUrl = canvas.toDataURL('image/png');
-      
       if (navigator.share) {
         try {
           const blob = await (await fetch(dataUrl)).blob();
           const file = new File([blob], 'x-qr-code.png', { type: 'image/png' });
-          await navigator.share({
-            title: 'X QR Code',
-            files: [file]
-          });
+          await navigator.share({ title: 'X QR Code', files: [file] });
           return;
-        } catch (e) {
-          // フォールバック
-        }
+        } catch (e) {}
       }
-
-      // シェア非対応端末はダウンロード/別タブ
       const link = document.createElement('a');
       link.download = 'x-qr-code.png';
       link.href = dataUrl;
       link.click();
     });
 
-    // 初期描画
     window.onload = drawCard;
+    drawCard();
   </script>
 </body>
 </html>
