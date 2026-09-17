@@ -57,7 +57,7 @@
       <label for="username">X ユーザーID</label>
       <div class="input-wrapper">
         <span class="prefix">@</span>
-        <input type="text" id="username" value="gdyjbsDvd" placeholder="ユーザーIDを入力" autocomplete="off" autocapitalize="none">
+        <input type="text" id="username" value="sample_user" placeholder="例: sample_user" autocomplete="off" autocapitalize="none">
       </div>
     </div>
   </div>
@@ -69,7 +69,7 @@
   </div>
 
   <script>
-    // --- 安定版QRコード生成エンジン (内蔵型) ---
+    // --- 外部依存なし 完全自前QRコード生成エンジン (Kazuhiko Arase氏作 アルゴリズム準拠) ---
     var QRCodeLib = function() {
       function QR8bitByte(data) { this.mode = 4; this.data = data; }
       QR8bitByte.prototype = {
