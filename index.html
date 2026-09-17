@@ -1,902 +1,332 @@
 <!DOCTYPE html>
-<html lang="ja" class="dark">
+<html lang="ja">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>X-QR Studio - スマホ最適化 XアカウントQRコード作成ツール</title>
-  <!-- Tailwind CSS -->
-  <script src="https://cdn.tailwindcss.com"></script>
-  <!-- FontAwesome Icons -->
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-  <!-- QRious QR Code Generator -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrious/4.0.2/qrious.min.js"></script>
-  
-  <script>
-    tailwind.config = {
-      darkMode: 'class',
-      theme: {
-        extend: {
-          colors: {
-            xblack: '#0f1419',
-            xdark: '#15202b',
-            xblue: '#1d9bf0',
-            xborder: '#2f3336'
-          }
-        }
-      }
-    }
-  </script>
-
+  <title>X QR Studio</title>
+  <!-- 安定したQRコード生成ライブラリ -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcode-generator/1.4.4/qrcode.min.js"></script>
   <style>
-    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
-    body {
-      font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-      background-color: #0b0e14;
-      color: #e7e9ea;
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
       -webkit-tap-highlight-color: transparent;
     }
-
-    /* Custom Scrollbar */
-    ::-webkit-scrollbar {
-      width: 6px;
-      height: 6px;
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      background: #0f172a;
+      color: #f8fafc;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 20px 16px 40px;
     }
-    ::-webkit-scrollbar-track {
-      background: #121824;
+    header {
+      text-align: center;
+      margin-bottom: 24px;
+      margin-top: 10px;
     }
-    ::-webkit-scrollbar-thumb {
-      background: #2b3548;
-      border-radius: 9999px;
+    h1 {
+      font-size: 22px;
+      font-weight: 800;
+      background: linear-gradient(135deg, #38bdf8, #818cf8);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      margin-bottom: 6px;
     }
-
-    /* Glass Effect UI */
-    .glass-panel {
-      background: rgba(21, 32, 43, 0.75);
-      backdrop-filter: blur(12px);
-      -webkit-backdrop-filter: blur(12px);
-      border: 1px solid rgba(255, 255, 255, 0.08);
+    p.sub {
+      font-size: 13px;
+      color: #94a3b8;
     }
-
-    /* Active Tab Glow */
-    .active-tab {
-      color: #1d9bf0;
-      border-bottom: 2px solid #1d9bf0;
+    .input-card {
+      width: 100%;
+      max-width: 400px;
+      background: #1e293b;
+      padding: 20px;
+      border-radius: 20px;
+      box-shadow: 0 10px 25px -5px rgba(0,0,0,0.3);
+      border: 1px solid #334155;
+      margin-bottom: 24px;
     }
-
-    /* Preview Canvas Styling */
-    #previewCanvas {
-      max-width: 100%;
+    .input-group {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    label {
+      font-size: 13px;
+      font-weight: 600;
+      color: #cbd5e1;
+    }
+    .input-wrapper {
+      display: flex;
+      align-items: center;
+      background: #0f172a;
+      border: 2px solid #334155;
+      border-radius: 12px;
+      padding: 0 14px;
+      transition: all 0.2s;
+    }
+    .input-wrapper:focus-within {
+      border-color: #38bdf8;
+    }
+    .prefix {
+      color: #64748b;
+      font-weight: 700;
+      font-size: 16px;
+    }
+    input[type="text"] {
+      width: 100%;
+      background: transparent;
+      border: none;
+      outline: none;
+      color: #ffffff;
+      padding: 14px 8px;
+      font-size: 16px;
+      font-weight: 600;
+    }
+    .preview-container {
+      width: 100%;
+      max-width: 360px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    canvas {
+      width: 100%;
       height: auto;
-      border-radius: 1.25rem;
-      box-shadow: 0 20px 40px -15px rgba(0, 0, 0, 0.6);
+      border-radius: 24px;
+      box-shadow: 0 20px 30px -10px rgba(0, 0, 0, 0.5);
+    }
+    .action-btn {
+      width: 100%;
+      max-width: 360px;
+      margin-top: 20px;
+      background: linear-gradient(135deg, #1d9bf0, #0c82d8);
+      color: #ffffff;
+      border: none;
+      padding: 16px;
+      border-radius: 16px;
+      font-size: 16px;
+      font-weight: 700;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      box-shadow: 0 4px 15px rgba(29, 155, 240, 0.4);
+      transition: transform 0.1s;
+    }
+    .action-btn:active {
+      transform: scale(0.98);
+    }
+    .hint {
+      font-size: 12px;
+      color: #64748b;
+      margin-top: 12px;
+      text-align: center;
     }
   </style>
 </head>
-<body class="min-h-screen flex flex-col justify-between pb-10">
+<body>
 
-  <div class="w-full max-w-md mx-auto px-4">
-    <!-- Header -->
-    <header class="py-4 flex items-center justify-between border-b border-gray-800/80 mb-4">
-      <div class="flex items-center space-x-2">
-        <div class="w-9 h-9 bg-black border border-gray-700 rounded-full flex items-center justify-center shadow-inner">
-          <i class="fa-brands fa-x-twitter text-xl text-white"></i>
-        </div>
-        <div>
-          <h1 class="font-bold text-lg leading-tight tracking-tight text-white flex items-center gap-1.5">
-            X-QR Studio
-            <span class="text-[10px] bg-xblue/20 text-xblue px-1.5 py-0.5 rounded-full font-semibold">PRO</span>
-          </h1>
-          <p class="text-xs text-gray-400">スマホでつくるX専用QRコード</p>
-        </div>
+  <header>
+    <h1>X QR Studio</h1>
+    <p class="sub">X用 高画質QRコード生成ツール</p>
+  </header>
+
+  <div class="input-card">
+    <div class="input-group">
+      <label for="username">X ユーザーID</label>
+      <div class="input-wrapper">
+        <span class="prefix">@</span>
+        <input type="text" id="username" value="risu_3risu_3" placeholder="ユーザーIDを入力" autocomplete="off" autocapitalize="none">
       </div>
-      
-      <!-- Info Button -->
-      <button id="infoBtn" class="w-9 h-9 rounded-full bg-gray-800/60 hover:bg-gray-700 flex items-center justify-center text-gray-300 transition">
-        <i class="fa-solid fa-circle-info text-sm"></i>
-      </button>
-    </header>
-
-    <!-- Main Card Preview Area -->
-    <main class="space-y-5">
-      <div class="relative flex flex-col items-center">
-        <!-- Badge -->
-        <div class="mb-2 text-center">
-          <span class="text-[11px] font-medium tracking-wider text-gray-400 uppercase bg-gray-900/80 px-3 py-1 rounded-full border border-gray-800">
-            <i class="fa-solid fa-eye text-xblue mr-1"></i> リアルタイムプレビュー
-          </span>
-        </div>
-
-        <!-- Canvas Container -->
-        <div class="relative w-full flex justify-center p-2 rounded-2xl bg-gradient-to-b from-gray-900/50 to-gray-950/80 border border-gray-800/60">
-          <canvas id="previewCanvas" class="w-full max-w-[320px] sm:max-w-[360px] transition-all duration-300"></canvas>
-        </div>
-      </div>
-
-      <!-- Action Buttons Grid (Mobile Optimized) -->
-      <div class="grid grid-cols-2 gap-2.5">
-        <button id="downloadBtn" class="flex items-center justify-center gap-2 bg-xblue hover:bg-blue-500 active:scale-[0.98] text-white font-semibold py-3 px-4 rounded-xl shadow-lg shadow-xblue/20 transition duration-150">
-          <i class="fa-solid fa-download text-base"></i>
-          <span>PNG保存</span>
-        </button>
-
-        <button id="mobileSaveBtn" class="flex items-center justify-center gap-2 bg-gray-800 hover:bg-gray-700 active:scale-[0.98] text-white font-semibold py-3 px-4 rounded-xl border border-gray-700/60 transition duration-150">
-          <i class="fa-solid fa-[#000] fa-mobile-screen-button text-base text-xblue"></i>
-          <span>長押し保存</span>
-        </button>
-
-        <button id="shareBtn" class="flex items-center justify-center gap-2 bg-gray-900 hover:bg-gray-850 active:scale-[0.98] text-gray-200 font-medium py-2.5 px-3 rounded-xl border border-gray-800 text-sm transition">
-          <i class="fa-solid fa-share-nodes text-xblue"></i>
-          <span>共有する</span>
-        </button>
-
-        <button id="copyUrlBtn" class="flex items-center justify-center gap-2 bg-gray-900 hover:bg-gray-850 active:scale-[0.98] text-gray-200 font-medium py-2.5 px-3 rounded-xl border border-gray-800 text-sm transition">
-          <i class="fa-regular fa-copy text-xblue"></i>
-          <span>URLコピー</span>
-        </button>
-      </div>
-
-      <!-- Control Panel Tabs -->
-      <div class="glass-panel rounded-2xl p-4 shadow-xl">
-        <div class="flex border-b border-gray-800 mb-4 text-sm font-medium text-gray-400">
-          <button id="tabAccount" class="flex-1 py-2.5 text-center active-tab transition flex items-center justify-center gap-1.5">
-            <i class="fa-solid fa-at"></i>
-            <span>アカウント</span>
-          </button>
-          <button id="tabTheme" class="flex-1 py-2.5 text-center transition flex items-center justify-center gap-1.5">
-            <i class="fa-solid fa-palette"></i>
-            <span>テーマ</span>
-          </button>
-          <button id="tabCustomize" class="flex-1 py-2.5 text-center transition flex items-center justify-center gap-1.5">
-            <i class="fa-solid fa-sliders"></i>
-            <span>詳細設定</span>
-          </button>
-        </div>
-
-        <!-- Tab Content 1: Account & URL -->
-        <div id="contentAccount" class="space-y-4">
-          <div>
-            <label class="block text-xs font-semibold text-gray-300 uppercase tracking-wider mb-1.5">
-              X ユーザー名 または プロフィールURL
-            </label>
-            <div class="relative">
-              <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-gray-500 font-bold">
-                @
-              </div>
-              <input type="text" id="usernameInput" value="elonmusk" placeholder="ユーザー名 (例: elonmusk)"
-                class="w-full pl-9 pr-10 py-3 bg-gray-950/80 border border-gray-700/80 rounded-xl text-white placeholder-gray-600 focus:outline-none focus:border-xblue focus:ring-1 focus:ring-xblue text-base font-medium transition">
-              <button id="clearInputBtn" class="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-500 hover:text-gray-300">
-                <i class="fa-solid fa-xmark"></i>
-              </button>
-            </div>
-            <p id="urlPreview" class="text-xs text-xblue mt-1.5 truncate flex items-center gap-1">
-              <i class="fa-solid fa-link text-[10px]"></i> https://x.com/elonmusk
-            </p>
-          </div>
-
-          <div>
-            <label class="block text-xs font-semibold text-gray-300 uppercase tracking-wider mb-1.5">
-              カードタイトル（表示用）
-            </label>
-            <input type="text" id="mainTextInput" value="Follow me on X" placeholder="例: フォローしてね！"
-              class="w-full px-3.5 py-2.5 bg-gray-950/80 border border-gray-700/80 rounded-xl text-white placeholder-gray-600 focus:outline-none focus:border-xblue text-sm transition">
-          </div>
-
-          <div>
-            <label class="block text-xs font-semibold text-gray-300 uppercase tracking-wider mb-1.5">
-              サブキャプション
-            </label>
-            <input type="text" id="subTextInput" value="Scan with camera" placeholder="例: カメラでスキャンしてください"
-              class="w-full px-3.5 py-2.5 bg-gray-950/80 border border-gray-700/80 rounded-xl text-white placeholder-gray-600 focus:outline-none focus:border-xblue text-sm transition">
-          </div>
-        </div>
-
-        <!-- Tab Content 2: Theme Select -->
-        <div id="contentTheme" class="hidden space-y-4">
-          <div>
-            <label class="block text-xs font-semibold text-gray-300 uppercase tracking-wider mb-2">
-              カードスタイルプリセット
-            </label>
-            <div class="grid grid-cols-2 gap-2.5" id="themeGrid">
-              <!-- Minimal Dark -->
-              <button data-theme="minimal-dark" class="theme-btn p-3 rounded-xl border-2 border-xblue bg-gray-950 text-left transition relative">
-                <div class="text-xs font-bold text-white">Minimal Dark</div>
-                <div class="text-[10px] text-gray-400 mt-0.5">X公式風ダーク</div>
-                <div class="absolute top-2 right-2 w-2 h-2 rounded-full bg-xblue"></div>
-              </button>
-
-              <!-- Clean Light -->
-              <button data-theme="clean-light" class="theme-btn p-3 rounded-xl border border-gray-800 bg-white text-left transition relative">
-                <div class="text-xs font-bold text-black">Clean Light</div>
-                <div class="text-[10px] text-gray-600 mt-0.5">爽やかライト</div>
-              </button>
-
-              <!-- Neon Cyber -->
-              <button data-theme="neon-dark" class="theme-btn p-3 rounded-xl border border-gray-800 bg-black text-left transition relative">
-                <div class="text-xs font-bold text-cyan-400">Neon Cyber</div>
-                <div class="text-[10px] text-gray-400 mt-0.5">ネオンサイバー</div>
-              </button>
-
-              <!-- Sunset Glow -->
-              <button data-theme="sunset-gradient" class="theme-btn p-3 rounded-xl border border-gray-800 bg-gradient-to-br from-pink-500 to-orange-400 text-left transition relative">
-                <div class="text-xs font-bold text-white drop-shadow">Sunset Glow</div>
-                <div class="text-[10px] text-white/80 mt-0.5">鮮やかサンセット</div>
-              </button>
-
-              <!-- Glassmorphism -->
-              <button data-theme="glassmorphism" class="theme-btn p-3 rounded-xl border border-gray-800 bg-slate-800/80 text-left transition relative">
-                <div class="text-xs font-bold text-sky-200">Glassmorphism</div>
-                <div class="text-[10px] text-gray-300 mt-0.5">半透明ガラス風</div>
-              </button>
-
-              <!-- ID Badge -->
-              <button data-theme="id-badge" class="theme-btn p-3 rounded-xl border border-gray-800 bg-gray-900 text-left transition relative">
-                <div class="text-xs font-bold text-yellow-400">ID Badge</div>
-                <div class="text-[10px] text-gray-400 mt-0.5">名刺・バッジ風</div>
-              </button>
-            </div>
-          </div>
-
-          <!-- Logo Options -->
-          <div class="pt-2 border-t border-gray-800/80">
-            <div class="flex items-center justify-between py-1">
-              <div>
-                <span class="text-xs font-semibold text-gray-200 block">中央にXロゴを表示</span>
-                <span class="text-[11px] text-gray-400 block">QRコード中心にアイコンを配置</span>
-              </div>
-              <label class="relative inline-flex items-center cursor-pointer">
-                <input type="checkbox" id="showLogoToggle" checked class="sr-only peer">
-                <div class="w-11 h-6 bg-gray-800 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-xblue"></div>
-              </label>
-            </div>
-          </div>
-
-          <div id="logoStyleContainer" class="pt-1">
-            <label class="block text-xs font-semibold text-gray-300 uppercase tracking-wider mb-1.5">
-              ロゴ背景の形状・スタイル
-            </label>
-            <div class="grid grid-cols-3 gap-2 text-xs">
-              <button data-logostyle="circle-black" class="logo-style-btn py-2 px-1 rounded-lg border border-xblue bg-gray-900 text-white font-medium text-center">
-                黒丸背景
-              </button>
-              <button data-logostyle="circle-white" class="logo-style-btn py-2 px-1 rounded-lg border border-gray-800 bg-gray-900 text-gray-400 font-medium text-center">
-                白丸背景
-              </button>
-              <button data-logostyle="square-round" class="logo-style-btn py-2 px-1 rounded-lg border border-gray-800 bg-gray-900 text-gray-400 font-medium text-center">
-                角丸方形
-              </button>
-            </div>
-          </div>
-        </div>
-
-        <!-- Tab Content 3: Advanced Customize -->
-        <div id="contentCustomize" class="hidden space-y-4">
-          <!-- QR Foreground Color -->
-          <div>
-            <div class="flex items-center justify-between mb-1.5">
-              <label class="text-xs font-semibold text-gray-300 uppercase tracking-wider">
-                QRドットの色
-              </label>
-              <button id="resetColorsBtn" class="text-[11px] text-xblue hover:underline">テーマ初期値に戻す</button>
-            </div>
-            <div class="flex items-center gap-3">
-              <input type="color" id="qrFgColorPicker" value="#ffffff" class="w-10 h-10 rounded-lg bg-transparent cursor-pointer border border-gray-700">
-              <div class="flex-1 grid grid-cols-5 gap-1.5">
-                <button class="color-preset w-full h-8 rounded-md bg-white border border-gray-600" data-fg="#ffffff"></button>
-                <button class="color-preset w-full h-8 rounded-md bg-black border border-gray-600" data-fg="#000000"></button>
-                <button class="color-preset w-full h-8 rounded-md bg-[#1d9bf0] border border-gray-600" data-fg="#1d9bf0"></button>
-                <button class="color-preset w-full h-8 rounded-md bg-[#00f0ff] border border-gray-600" data-fg="#00f0ff"></button>
-                <button class="color-preset w-full h-8 rounded-md bg-[#ff2a85] border border-gray-600" data-fg="#ff2a85"></button>
-              </div>
-            </div>
-          </div>
-
-          <!-- QR Background Color -->
-          <div>
-            <label class="block text-xs font-semibold text-gray-300 uppercase tracking-wider mb-1.5">
-              QRバックグラウンド色
-            </label>
-            <div class="flex items-center gap-3">
-              <input type="color" id="qrBgColorPicker" value="#0f1419" class="w-10 h-10 rounded-lg bg-transparent cursor-pointer border border-gray-700">
-              <div class="flex-1 grid grid-cols-5 gap-1.5">
-                <button class="bg-preset w-full h-8 rounded-md bg-[#0f1419] border border-gray-600" data-bg="#0f1419"></button>
-                <button class="bg-preset w-full h-8 rounded-md bg-white border border-gray-600" data-bg="#ffffff"></button>
-                <button class="bg-preset w-full h-8 rounded-md bg-[#000000] border border-gray-600" data-bg="#000000"></button>
-                <button class="bg-preset w-full h-8 rounded-md bg-[#16202c] border border-gray-600" data-bg="#16202c"></button>
-                <button class="bg-preset w-full h-8 rounded-md bg-[#120826] border border-gray-600" data-bg="#120826"></button>
-              </div>
-            </div>
-          </div>
-
-          <!-- Corner Radius Option -->
-          <div class="pt-2 border-t border-gray-800">
-            <label class="block text-xs font-semibold text-gray-300 uppercase tracking-wider mb-1.5">
-              カード枠の丸み
-            </label>
-            <input type="range" id="borderRadiusRange" min="8" max="40" value="28" class="w-full accent-xblue bg-gray-800">
-          </div>
-        </div>
-      </div>
-    </main>
-
-    <!-- Footer -->
-    <footer class="mt-8 text-center text-xs text-gray-500">
-      <p>X-QR Studio &copy; 2026 - Mobile-First QR Generator</p>
-    </footer>
-  </div>
-
-  <!-- Long Press Save Modal for Mobile Browsers -->
-  <div id="saveModal" class="fixed inset-0 bg-black/90 backdrop-blur-md z-50 flex items-center justify-center p-4 opacity-0 pointer-events-none transition-opacity duration-200">
-    <div class="bg-gray-900 border border-gray-800 rounded-2xl max-w-sm w-full p-5 text-center shadow-2xl relative flex flex-col items-center">
-      <button id="closeModalBtn" class="absolute top-3 right-3 w-8 h-8 rounded-full bg-gray-800 text-gray-400 hover:text-white flex items-center justify-center">
-        <i class="fa-solid fa-xmark text-lg"></i>
-      </button>
-
-      <div class="w-10 h-10 rounded-full bg-xblue/20 text-xblue flex items-center justify-center mb-3">
-        <i class="fa-solid fa-hand-pointer text-lg"></i>
-      </div>
-
-      <h3 class="text-base font-bold text-white mb-1">画像を長押しして保存</h3>
-      <p class="text-xs text-gray-400 mb-4">iOS Safari / Android Chrome では、下の画像を長押しすると「写真に保存」を選択できます。</p>
-
-      <!-- Dynamic Generated Image Display -->
-      <div class="p-2 bg-gray-950 rounded-xl border border-gray-800 mb-4 max-w-[260px]">
-        <img id="modalImg" src="" alt="X QR Code" class="w-full h-auto rounded-lg shadow-md">
-      </div>
-
-      <button id="modalCloseActionBtn" class="w-full py-2.5 bg-gray-800 hover:bg-gray-700 text-white font-medium rounded-xl text-sm transition">
-        閉じる
-      </button>
     </div>
   </div>
 
-  <!-- Info Modal -->
-  <div id="infoModal" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4 opacity-0 pointer-events-none transition-opacity duration-200">
-    <div class="bg-gray-900 border border-gray-800 rounded-2xl max-w-sm w-full p-5 text-left shadow-2xl relative">
-      <button id="closeInfoModalBtn" class="absolute top-3 right-3 w-8 h-8 rounded-full bg-gray-800 text-gray-400 hover:text-white flex items-center justify-center">
-        <i class="fa-solid fa-xmark"></i>
-      </button>
-      <h3 class="text-base font-bold text-white mb-2 flex items-center gap-2">
-        <i class="fa-brands fa-x-twitter text-xblue"></i> X-QR Studioについて
-      </h3>
-      <div class="text-xs text-gray-300 space-y-2.5 leading-relaxed">
-        <p>X-QR Studioは、スマホだけで誰でも簡単に洗練されたX（旧Twitter）アカウント用QRコードカードを作成できるツールです。</p>
-        <ul class="list-disc pl-4 space-y-1 text-gray-400">
-          <li>@付きユーザー名やURLの自動判別</li>
-          <li>スマホの長押し保存やWeb Shareに対応</li>
-          <li>画像データはブラウザ内でローカル生成（サーバー送信なし）</li>
-        </ul>
-      </div>
-      <button id="infoOkBtn" class="w-full mt-4 py-2.5 bg-xblue hover:bg-blue-500 text-white font-semibold rounded-xl text-sm transition">
-        了解しました
-      </button>
-    </div>
-  </div>
-
-  <!-- Toast Notification -->
-  <div id="toast" class="fixed bottom-6 left-1/2 transform -translate-x-1/2 bg-gray-800/95 border border-gray-700 text-white px-4 py-2.5 rounded-full shadow-2xl text-xs font-medium flex items-center gap-2 opacity-0 pointer-events-none transition-all duration-300 z-50">
-    <i id="toastIcon" class="fa-solid fa-circle-check text-xblue"></i>
-    <span id="toastMsg">メッセージ</span>
+  <div class="preview-container">
+    <canvas id="qrCanvas" width="800" height="1000"></canvas>
+    <button class="action-btn" id="saveBtn">画像を保存・共有する</button>
+    <p class="hint">※ ボタンを押すか、画像を長押しして保存できます</p>
   </div>
 
   <script>
-    // App State Management
-    const state = {
-      rawInput: 'elonmusk',
-      username: 'elonmusk',
-      formattedUrl: 'https://x.com/elonmusk',
-      mainText: 'Follow me on X',
-      subText: 'Scan with camera',
-      theme: 'minimal-dark',
-      showLogo: true,
-      logoStyle: 'circle-black', // circle-black, circle-white, square-round
-      customFgColor: null,
-      customBgColor: null,
-      borderRadius: 28
-    };
+    const usernameInput = document.getElementById('username');
+    const canvas = document.getElementById('qrCanvas');
+    const ctx = canvas.getContext('2d');
+    const saveBtn = document.getElementById('saveBtn');
 
-    // Theme Config Definitions
-    const themes = {
-      'minimal-dark': {
-        cardBg: '#0f1419',
-        cardBgGradient: ['#0f1419', '#16202c'],
-        cardBorder: '#2f3336',
-        textColor: '#ffffff',
-        subTextColor: '#8b98a5',
-        qrFg: '#ffffff',
-        qrBg: '#15202b',
-        accent: '#1d9bf0'
-      },
-      'clean-light': {
-        cardBg: '#ffffff',
-        cardBgGradient: ['#ffffff', '#f7f9f9'],
-        cardBorder: '#e1e8ed',
-        textColor: '#0f1419',
-        subTextColor: '#536471',
-        qrFg: '#0f1419',
-        qrBg: '#ffffff',
-        accent: '#1d9bf0'
-      },
-      'neon-dark': {
-        cardBg: '#05050a',
-        cardBgGradient: ['#080812', '#020205'],
-        cardBorder: '#00f0ff',
-        textColor: '#ffffff',
-        subTextColor: '#00f0ff',
-        qrFg: '#00f0ff',
-        qrBg: '#0a0a16',
-        accent: '#ff007f'
-      },
-      'sunset-gradient': {
-        cardBg: '#2d112c',
-        cardBgGradient: ['#4a154b', '#190a28'],
-        cardBorder: '#ff7b00',
-        textColor: '#ffffff',
-        subTextColor: '#ffb380',
-        qrFg: '#ffffff',
-        qrBg: '#2a0e2a',
-        accent: '#ff4500'
-      },
-      'glassmorphism': {
-        cardBg: '#111827',
-        cardBgGradient: ['#1f2937', '#0f172a'],
-        cardBorder: '#374151',
-        textColor: '#f3f4f6',
-        subTextColor: '#9ca3af',
-        qrFg: '#38bdf8',
-        qrBg: '#111827',
-        accent: '#38bdf8'
-      },
-      'id-badge': {
-        cardBg: '#18181b',
-        cardBgGradient: ['#27272a', '#18181b'],
-        cardBorder: '#eab308',
-        textColor: '#fef08a',
-        subTextColor: '#a1a1aa',
-        qrFg: '#fef08a',
-        qrBg: '#18181b',
-        accent: '#eab308'
-      }
-    };
+    function drawCard() {
+      let rawUser = usernameInput.value.trim().replace(/^@/, '');
+      const displayUser = rawUser ? `@${rawUser}` : '@username';
+      const targetUrl = rawUser ? `https://x.com/${rawUser}` : 'https://x.com';
 
-    // DOM Elements
-    const previewCanvas = document.getElementById('previewCanvas');
-    const ctx = previewCanvas.getContext('2d');
-    const usernameInput = document.getElementById('usernameInput');
-    const urlPreview = document.getElementById('urlPreview');
-    const mainTextInput = document.getElementById('mainTextInput');
-    const subTextInput = document.getElementById('subTextInput');
-    const showLogoToggle = document.getElementById('showLogoToggle');
-    const qrFgColorPicker = document.getElementById('qrFgColorPicker');
-    const qrBgColorPicker = document.getElementById('qrBgColorPicker');
-    const borderRadiusRange = document.getElementById('borderRadiusRange');
-    const toast = document.getElementById('toast');
-    const toastMsg = document.getElementById('toastMsg');
+      // 1. キャンバス初期化
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-    // Helper: Normalize Username & URL
-    function parseUsername(input) {
-      if (!input || !input.trim()) return 'username';
-      let clean = input.trim();
-      
-      // Handle URL formats
-      clean = clean.replace(/^https?:\/\/(www\.)?(x|twitter)\.com\//i, '');
-      // Handle @
-      clean = clean.replace(/^@/, '');
-      // Remove query params and trailing slashes
-      clean = clean.split('/')[0].split('?')[0];
-      
-      return clean || 'username';
-    }
-
-    function updateUrl() {
-      state.username = parseUsername(state.rawInput);
-      state.formattedUrl = `https://x.com/${state.username}`;
-      urlPreview.innerHTML = `<i class="fa-solid fa-link text-[10px]"></i> ${state.formattedUrl}`;
-    }
-
-    // Main Rendering Function (High Resolution 800x1000 Canvas)
-    function renderCard() {
-      const width = 800;
-      const height = 1000;
-      previewCanvas.width = width;
-      previewCanvas.height = height;
-
-      const theme = themes[state.theme];
-      const fgColor = state.customFgColor || theme.qrFg;
-      const bgColor = state.customBgColor || theme.qrBg;
-
-      // Clear Canvas
-      ctx.clearRect(0, 0, width, height);
-
-      // 1. Draw Card Background with Rounded Rect
-      ctx.save();
-      const r = state.borderRadius * 2; // Scaled radius
-      ctx.beginPath();
-      ctx.moveTo(r, 0);
-      ctx.lineTo(width - r, 0);
-      ctx.quadraticCurveTo(width, 0, width, r);
-      ctx.lineTo(width, height - r);
-      ctx.quadraticCurveTo(width, height, width - r, height);
-      ctx.lineTo(r, height);
-      ctx.quadraticCurveTo(0, height, 0, height - r);
-      ctx.lineTo(0, r);
-      ctx.quadraticCurveTo(0, 0, r, 0);
-      ctx.closePath();
-
-      // Background Gradient
-      const bgGrad = ctx.createLinearGradient(0, 0, width, height);
-      bgGrad.addColorStop(0, theme.cardBgGradient[0]);
-      bgGrad.addColorStop(1, theme.cardBgGradient[1]);
+      // 2. 背景グラデーション
+      const bgGrad = ctx.createLinearGradient(0, 0, canvas.width, canvas.height);
+      bgGrad.addColorStop(0, '#15202b');
+      bgGrad.addColorStop(1, '#0b0f14');
       ctx.fillStyle = bgGrad;
+      
+      // 角丸外枠
+      drawRoundedRect(ctx, 0, 0, canvas.width, canvas.height, 40);
       ctx.fill();
 
-      // Border Stroke
+      // カード金色の枠線
+      ctx.strokeStyle = '#d97706';
       ctx.lineWidth = 12;
-      ctx.strokeStyle = theme.cardBorder;
-      ctx.stroke();
-      ctx.restore();
-
-      // ID Badge Top Strap Hole Simulation
-      if (state.theme === 'id-badge') {
-        ctx.save();
-        ctx.fillStyle = '#000000';
-        ctx.beginPath();
-        ctx.roundRect(width / 2 - 60, 24, 120, 20, 10);
-        ctx.fill();
-        ctx.strokeStyle = '#3f3f46';
-        ctx.lineWidth = 3;
-        ctx.stroke();
-        ctx.restore();
-      }
-
-      // 2. Draw Header Icon & Branding
-      const startY = state.theme === 'id-badge' ? 90 : 70;
-
-      // X Logo Badge
-      ctx.save();
-      ctx.fillStyle = theme.textColor;
-      ctx.font = '900 48px sans-serif';
-      ctx.textAlign = 'center';
-      
-      // Draw X Symbol
-      drawXLogoPath(ctx, width / 2, startY + 20, 48, theme.textColor);
-
-      // Title Text
-      ctx.font = '700 38px sans-serif';
-      ctx.fillStyle = theme.textColor;
-      ctx.fillText(state.mainText || 'Follow me on X', width / 2, startY + 105);
-
-      // Username Handle Text
-      ctx.font = '600 32px sans-serif';
-      ctx.fillStyle = theme.accent;
-      ctx.fillText(`@${state.username}`, width / 2, startY + 155);
-      ctx.restore();
-
-      // 3. Generate QR Code
-      const qrSize = 460;
-      const qrX = (width - qrSize) / 2;
-      const qrY = startY + 205;
-
-      // Temporary Hidden QR Canvas
-      const tempQrCanvas = document.createElement('canvas');
-      const qr = new QRious({
-        element: tempQrCanvas,
-        value: state.formattedUrl,
-        size: qrSize,
-        level: 'H', // High error correction for logo overlay
-        foreground: fgColor,
-        backgroundColor: bgColor
-      });
-
-      // Draw QR Box Container with Rounded Corners
-      ctx.save();
-      const qrPadding = 24;
-      const boxSize = qrSize + (qrPadding * 2);
-      const boxX = qrX - qrPadding;
-      const boxY = qrY - qrPadding;
-
-      ctx.beginPath();
-      ctx.roundRect(boxX, boxY, boxSize, boxSize, 32);
-      ctx.fillStyle = bgColor;
-      ctx.fill();
-      ctx.lineWidth = 2;
-      ctx.strokeStyle = 'rgba(255,255,255,0.1)';
+      drawRoundedRect(ctx, 10, 10, canvas.width - 20, canvas.height - 20, 32);
       ctx.stroke();
 
-      // Draw QR Code onto main canvas
-      ctx.drawImage(tempQrCanvas, qrX, qrY, qrSize, qrSize);
-      ctx.restore();
+      // 3. 上部 Xロゴ
+      ctx.fillStyle = '#ffffff';
+      drawXLogo(ctx, canvas.width / 2, 110, 48);
 
-      // 4. Center Logo Overlay
-      if (state.showLogo) {
-        const logoCenterRadius = 42;
-        const centerX = width / 2;
-        const centerY = qrY + (qrSize / 2);
+      // 4. テキスト
+      ctx.textAlign = 'center';
+      ctx.fillStyle = '#fef08a';
+      ctx.font = 'bold 38px -apple-system, sans-serif';
+      ctx.fillText('Follow me on X', canvas.width / 2, 200);
 
-        ctx.save();
-        ctx.beginPath();
+      ctx.fillStyle = '#fef08a';
+      ctx.font = 'bold 34px -apple-system, sans-serif';
+      ctx.fillText(displayUser, canvas.width / 2, 255);
 
-        if (state.logoStyle === 'square-round') {
-          ctx.roundRect(centerX - logoCenterRadius, centerY - logoCenterRadius, logoCenterRadius * 2, logoCenterRadius * 2, 16);
-        } else {
-          ctx.arc(centerX, centerY, logoCenterRadius, 0, Math.PI * 2);
-        }
+      // 5. QRコード生成（Error Correction Level H: 30%欠けても復元可能）
+      try {
+        const qr = qrcode(0, 'H');
+        qr.addData(targetUrl);
+        qr.make();
 
-        let bgStyle = '#000000';
-        let logoColor = '#ffffff';
+        const count = qr.getModuleCount();
+        const qrSize = 520;
+        const margin = 30;
+        const boxX = (canvas.width - qrSize) / 2;
+        const boxY = 300;
 
-        if (state.logoStyle === 'circle-white') {
-          bgStyle = '#ffffff';
-          logoColor = '#000000';
-        }
-
-        ctx.fillStyle = bgStyle;
+        // QRの台座背景（黒）
+        ctx.fillStyle = '#05070a';
+        drawRoundedRect(ctx, boxX - margin, boxY - margin, qrSize + margin * 2, qrSize + margin * 2, 28);
         ctx.fill();
-        ctx.lineWidth = 6;
-        ctx.strokeStyle = bgColor;
+        ctx.strokeStyle = '#1e293b';
+        ctx.lineWidth = 4;
         ctx.stroke();
 
-        // Draw central X icon
-        drawXLogoPath(ctx, centerX, centerY - 2, 34, logoColor);
-        ctx.restore();
+        // QRコード描画
+        const cellSize = qrSize / count;
+        ctx.fillStyle = '#ffffff';
 
-      }
-
-      // 5. Draw Footer Subtext
-      ctx.save();
-      ctx.font = '500 24px sans-serif';
-      ctx.fillStyle = theme.subTextColor;
-      ctx.textAlign = 'center';
-      ctx.fillText(state.subText || 'Scan with camera', width / 2, height - 70);
-
-      // Mini Branding
-      ctx.font = '600 16px sans-serif';
-      ctx.fillStyle = 'rgba(255,255,255,0.3)';
-      ctx.fillText('X-QR STUDIO', width / 2, height - 36);
-      ctx.restore();
-    }
-
-    // Helper: Draw Crisp X Logo Path
-    function drawXLogoPath(context, x, y, size, color) {
-      context.save();
-      context.translate(x, y);
-      const scale = size / 24;
-      context.scale(scale, scale);
-      
-      // X Path Centered at (0,0)
-      const path = new Path2D("M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z");
-      context.translate(-12, -12); // Center offset
-      context.fillStyle = color;
-      context.fill(path);
-      context.restore();
-    }
-
-    // Download PNG
-    document.getElementById('downloadBtn').addEventListener('click', () => {
-      const dataUrl = previewCanvas.toDataURL('image/png');
-      const link = document.createElement('a');
-      link.download = `X_QR_${state.username}.png`;
-      link.href = dataUrl;
-      link.click();
-      showToast('PNG画像を保存しました！', 'fa-download');
-    });
-
-    // Mobile Long Press Modal
-    document.getElementById('mobileSaveBtn').addEventListener('click', () => {
-      const dataUrl = previewCanvas.toDataURL('image/png');
-      document.getElementById('modalImg').src = dataUrl;
-      const modal = document.getElementById('saveModal');
-      modal.classList.remove('opacity-0', 'pointer-events-none');
-    });
-
-    document.getElementById('closeModalBtn').addEventListener('click', closeModal);
-    document.getElementById('modalCloseActionBtn').addEventListener('click', closeModal);
-
-    function closeModal() {
-      document.getElementById('saveModal').classList.add('opacity-0', 'pointer-events-none');
-    }
-
-    // Web Share API
-    document.getElementById('shareBtn').addEventListener('click', async () => {
-      if (navigator.share) {
-        try {
-          // Convert canvas to Blob for file sharing
-          previewCanvas.toBlob(async (blob) => {
-            const file = new File([blob], `X_QR_${state.username}.png`, { type: 'image/png' });
-            
-            if (navigator.canShare && navigator.canShare({ files: [file] })) {
-              await navigator.share({
-                files: [file],
-                title: `@${state.username} on X`,
-                text: `Follow @${state.username} on X!`
-              });
-            } else {
-              await navigator.share({
-                title: `@${state.username} on X`,
-                url: state.formattedUrl
-              });
+        for (let row = 0; row < count; row++) {
+          for (let col = 0; col < count; col++) {
+            if (qr.isDark(row, col)) {
+              ctx.fillRect(
+                boxX + col * cellSize,
+                boxY + row * cellSize,
+                cellSize + 0.5,
+                cellSize + 0.5
+              );
             }
-            showToast('共有ダイアログを開きました', 'fa-share-nodes');
-          });
-        } catch (err) {
-          if (err.name !== 'AbortError') {
-            copyUrlToClipboard();
           }
         }
-      } else {
-        copyUrlToClipboard();
+
+        // 6. QR中央のXロゴアイコン
+        const iconSize = 100;
+        const iconX = canvas.width / 2;
+        const iconY = boxY + qrSize / 2;
+
+        ctx.fillStyle = '#05070a';
+        ctx.beginPath();
+        ctx.arc(iconX, iconY, iconSize / 2 + 8, 0, Math.PI * 2);
+        ctx.fill();
+
+        ctx.fillStyle = '#ffffff';
+        drawXLogo(ctx, iconX, iconY, iconSize * 0.5);
+
+      } catch (e) {
+        console.error(e);
       }
-    });
 
-    // Copy URL
-    document.getElementById('copyUrlBtn').addEventListener('click', copyUrlToClipboard);
+      // 7. フッター
+      ctx.fillStyle = '#64748b';
+      ctx.font = '500 22px -apple-system, sans-serif';
+      ctx.fillText('Scan with camera', canvas.width / 2, 900);
 
-    function copyUrlToClipboard() {
-      const textToCopy = state.formattedUrl;
+      ctx.fillStyle = '#475569';
+      ctx.font = 'bold 18px -apple-system, sans-serif';
+      ctx.fillText('X-QR STUDIO', canvas.width / 2, 940);
+    }
+
+    function drawRoundedRect(ctx, x, y, width, height, radius) {
+      ctx.beginPath();
+      ctx.moveTo(x + radius, y);
+      ctx.lineTo(x + width - radius, y);
+      ctx.quadraticCurveTo(x + width, y, x + width, y + radius);
+      ctx.lineTo(x + width, y + height - radius);
+      ctx.quadraticCurveTo(x + width, y + height, x + width - radius, y + height);
+      ctx.lineTo(x + radius, y + height);
+      ctx.quadraticCurveTo(x, y + height, x, y + height - radius);
+      ctx.lineTo(x, y + radius);
+      ctx.quadraticCurveTo(x, y, x + radius, y);
+      ctx.closePath();
+    }
+
+    function drawXLogo(ctx, cx, cy, size) {
+      ctx.save();
+      ctx.translate(cx, cy);
+      const s = size / 2;
+      ctx.beginPath();
+      ctx.moveTo(-s, -s);
+      ctx.lineTo(s * 0.6, s);
+      ctx.lineTo(s, s);
+      ctx.lineTo(-s * 0.6, -s);
+      ctx.closePath();
+      ctx.fill();
+
+      ctx.beginPath();
+      ctx.moveTo(s, -s);
+      ctx.lineTo(-s * 0.6, s);
+      ctx.lineTo(-s, s);
+      ctx.lineTo(s * 0.6, -s);
+      ctx.closePath();
+      ctx.fill();
+      ctx.restore();
+    }
+
+    // イベント設定
+    usernameInput.addEventListener('input', drawCard);
+
+    // 画像保存・共有
+    saveBtn.addEventListener('click', async () => {
+      const dataUrl = canvas.toDataURL('image/png');
       
-      // Fallback execCommand for iFrame / Safari restrictions
-      const dummy = document.createElement('textarea');
-      document.body.appendChild(dummy);
-      dummy.value = textToCopy;
-      dummy.select();
-      document.execCommand('copy');
-      document.body.removeChild(dummy);
+      if (navigator.share) {
+        try {
+          const blob = await (await fetch(dataUrl)).blob();
+          const file = new File([blob], 'x-qr-code.png', { type: 'image/png' });
+          await navigator.share({
+            title: 'X QR Code',
+            files: [file]
+          });
+          return;
+        } catch (e) {
+          // フォールバック
+        }
+      }
 
-      showToast('プロフィールURLをコピーしました！', 'fa-copy');
-    }
-
-    // Show Toast Notification
-    function showToast(message, iconClass = 'fa-circle-check') {
-      toastMsg.innerText = message;
-      document.getElementById('toastIcon').className = `fa-solid ${iconClass} text-xblue`;
-      toast.classList.remove('opacity-0', 'pointer-events-none');
-      toast.classList.add('translate-y-0');
-
-      setTimeout(() => {
-        toast.classList.add('opacity-0', 'pointer-events-none');
-      }, 2500);
-    }
-
-    // Tab Switches
-    const tabs = {
-      tabAccount: document.getElementById('contentAccount'),
-      tabTheme: document.getElementById('contentTheme'),
-      tabCustomize: document.getElementById('contentCustomize')
-    };
-
-    Object.keys(tabs).forEach(tabId => {
-      document.getElementById(tabId).addEventListener('click', (e) => {
-        // Active tab style
-        Object.keys(tabs).forEach(id => {
-          document.getElementById(id).classList.remove('active-tab');
-          tabs[id].classList.add('hidden');
-        });
-        document.getElementById(tabId).classList.add('active-tab');
-        tabs[tabId].classList.remove('hidden');
-      });
+      // シェア非対応端末はダウンロード/別タブ
+      const link = document.createElement('a');
+      link.download = 'x-qr-code.png';
+      link.href = dataUrl;
+      link.click();
     });
 
-    // Input Listeners
-    usernameInput.addEventListener('input', (e) => {
-      state.rawInput = e.target.value;
-      updateUrl();
-      renderCard();
-    });
-
-    document.getElementById('clearInputBtn').addEventListener('click', () => {
-      usernameInput.value = '';
-      state.rawInput = '';
-      updateUrl();
-      renderCard();
-      usernameInput.focus();
-    });
-
-    mainTextInput.addEventListener('input', (e) => {
-      state.mainText = e.target.value;
-      renderCard();
-    });
-
-    subTextInput.addEventListener('input', (e) => {
-      state.subText = e.target.value;
-      renderCard();
-    });
-
-    // Theme Selector Buttons
-    document.querySelectorAll('.theme-btn').forEach(btn => {
-      btn.addEventListener('click', () => {
-        document.querySelectorAll('.theme-btn').forEach(b => {
-          b.classList.remove('border-2', 'border-xblue');
-          b.classList.add('border', 'border-gray-800');
-        });
-        btn.classList.remove('border-gray-800');
-        btn.classList.add('border-2', 'border-xblue');
-
-        state.theme = btn.getAttribute('data-theme');
-        // Reset custom colors on theme change
-        state.customFgColor = null;
-        state.customBgColor = null;
-        
-        renderCard();
-      });
-    });
-
-    // Logo Toggle & Style
-    showLogoToggle.addEventListener('change', (e) => {
-      state.showLogo = e.target.checked;
-      document.getElementById('logoStyleContainer').style.display = state.showLogo ? 'block' : 'none';
-      renderCard();
-    });
-
-    document.querySelectorAll('.logo-style-btn').forEach(btn => {
-      btn.addEventListener('click', () => {
-        document.querySelectorAll('.logo-style-btn').forEach(b => {
-          b.classList.remove('border-xblue', 'text-white');
-          b.classList.add('border-gray-800', 'text-gray-400');
-        });
-        btn.classList.remove('border-gray-800', 'text-gray-400');
-        btn.classList.add('border-xblue', 'text-white');
-
-        state.logoStyle = btn.getAttribute('data-logostyle');
-        renderCard();
-      });
-    });
-
-    // QR Color Pickers
-    qrFgColorPicker.addEventListener('input', (e) => {
-      state.customFgColor = e.target.value;
-      renderCard();
-    });
-
-    qrBgColorPicker.addEventListener('input', (e) => {
-      state.customBgColor = e.target.value;
-      renderCard();
-    });
-
-    document.querySelectorAll('.color-preset').forEach(btn => {
-      btn.addEventListener('click', () => {
-        const color = btn.getAttribute('data-fg');
-        qrFgColorPicker.value = color;
-        state.customFgColor = color;
-        renderCard();
-      });
-    });
-
-    document.querySelectorAll('.bg-preset').forEach(btn => {
-      btn.addEventListener('click', () => {
-        const color = btn.getAttribute('data-bg');
-        qrBgColorPicker.value = color;
-        state.customBgColor = color;
-        renderCard();
-      });
-    });
-
-    document.getElementById('resetColorsBtn').addEventListener('click', () => {
-      state.customFgColor = null;
-      state.customBgColor = null;
-      renderCard();
-      showToast('カラーを初期化しました');
-    });
-
-    borderRadiusRange.addEventListener('input', (e) => {
-      state.borderRadius = parseInt(e.target.value);
-      renderCard();
-    });
-
-    // Info Modal Handlers
-    document.getElementById('infoBtn').addEventListener('click', () => {
-      document.getElementById('infoModal').classList.remove('opacity-0', 'pointer-events-none');
-    });
-    document.getElementById('closeInfoModalBtn').addEventListener('click', () => {
-      document.getElementById('infoModal').classList.add('opacity-0', 'pointer-events-none');
-    });
-    document.getElementById('infoOkBtn').addEventListener('click', () => {
-      document.getElementById('infoModal').classList.add('opacity-0', 'pointer-events-none');
-    });
-
-    // Initialize on Load
-    window.onload = function() {
-      updateUrl();
-      renderCard();
-    };
+    // 初期描画
+    window.onload = drawCard;
   </script>
 </body>
 </html>
